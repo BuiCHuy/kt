@@ -224,139 +224,147 @@ public class NhanVienManagementGUI extends JFrame {
     // CHỨC NĂNG XỬ LÝ DỮ LIỆU
     // =============================================================
     
-    
-    private boolean Validate() {
-    	String ht = hotenField.getText();
-    	String gt = gioitinhBox.getSelectedItem().toString();
-    	String ns = ngaysinhField.getText().trim();
-    	String sdt = sdtField.getText().trim();
-	    String diachi = diachiField.getText().trim();
-	    String tk = tkField.getText().trim();
-	    String mk = mkField.getText().trim();
-	    String regex = "^[a-zA-Z\\s\\p{L}]+$";
-	    LocalDate dob; 
-	    // validate tên nhân viên
-	    if(ht.isEmpty()) {
-	    	emessage = "Vui lòng nhập tên nhân viên" ;
-	    	return false;
-	    }
-	    else if(!ht.matches(regex)) {
-	    	emessage = "Tên nhân viên không được chứa ký tự đặc biệt";
-	    	return false;
-	    }
-	    else if(ht.length()>30) {
-	    	emessage = "Vui lòng nhập họ tên không quá 30 ký tự";
-	    	return false;
-	    }
-	    // validate giới tính
-	    if(gt=="") {
-	    	emessage = "Vui lòng chọn giới tính";
-	    	return false;
-	    }
-	    
-	    // validate ngày sinh
-	    if(ns.isEmpty()) {
-	    	emessage = "Vui lòng nhập ngày sinh";
-	    }
-	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd"); 
-	 
-		 try {
-		     dob = LocalDate.parse(ns, formatter);
-		         
-		     if (dob.isAfter(LocalDate.now())) {
-		         emessage = "Ngày sinh không được là ngày trong tương lai";
-		         return false;
-		     }
-		         
-		 } catch (DateTimeParseException ex) {
-		     emessage = "Ngày sinh không hợp lệ (Định dạng YYYY/MM/DD hoặc ngày tháng không tồn tại)";
-		     return false;
-		 }
-		 LocalDate minAgeDate = LocalDate.now().minusYears(18);   
-	    if (dob.isAfter(minAgeDate)) {
-	        emessage = "Độ tuổi không hợp lệ. Nhân viên phải từ 18 tuổi trở lên";
-	        return false;
-	    }
-		   
-	    //validate sdt
-	    if (sdt.isEmpty()) {
-	        emessage = "Vui lòng nhập số điện thoại";
-	        return false;
-	    }
-	    else if (!sdt.matches("\\d+")) {
-	    	emessage = "Số điện thoại chỉ được chứa ký tự số";
-	        return false;
-	    }
-	    else if(!sdt.startsWith("0")) {
-	    	emessage  = "Số điện thoại phải bắt đầu từ số 0";
-	        return false;
-	    }
-	    else if(sdt.length()!= 11 && sdt.length()!=10) {
-	    	emessage  = "Số điện thoại phải có 10 hoặc 11 chữ số";
-	    	return false;
-	    }
-	    // validate cho địa chỉ
-	    String addressPattern = "^[a-zA-Z0-9\\s\\p{L}/,.-]+$"; 
-	    if(diachi.isEmpty()) {
-	    	emessage  = "Vui lòng nhập địa chỉ";
-	        return false;
-	    }
-	    else if(diachi.length()>100) {
-	    	emessage = "Vui lòng nhập địa chỉ không quá 100 ký tự";
-	    	return false;
-	    }
-	    else if(!diachi.matches(addressPattern)) {
-	    	emessage = "Địa chỉ không được chứa ký tự đặc biệt";
-	    	return false;
-	    }
-	    
-	    //validate cho tài khoản
-	    String emailPattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"; 
-	    if(tk.isEmpty()) {
-	    	emessage = "Vui lòng nhập tên tài khoản";
-	    	return false;
-	    }
-	    else if(tk.length()>30) {
-	    	emessage = "Email không được vượt quá 30 ký tự";
-	    	return false;
-	    }
-	    else if(!tk.matches(emailPattern)) {
-	    	emessage = "Vui lòng nhập đúng định dạng Email";
-	    	return false;
-	    }
-	    for (nhanvien nv : nhanVienList) {
+    private boolean validateHoTen() {
+        String ht = hotenField.getText();//1
+        String regex = "^[a-zA-Z\\s\\p{L}]+$";//2
+        if (ht.isEmpty()) {//3
+            emessage = "Vui lòng nhập tên nhân viên";//4
+            return false;//5
+        } else if (!ht.matches(regex)) {//6
+            emessage = "Tên nhân viên không được chứa ký tự đặc biệt";//7
+            return false;//8
+        } else if (ht.length() > 30) {//9
+            emessage = "Vui lòng nhập họ tên không quá 30 ký tự";//10
+            return false;//11
+        }//12
+        return true;//13
+    }
+
+    private boolean validateGioiTinh() {
+        String gt = gioitinhBox.getSelectedItem().toString();
+        if (gt.isEmpty()) {
+            emessage = "Vui lòng chọn giới tính";
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validateNgaySinh() {
+        String ns = ngaysinhField.getText().trim();
+        if (ns.isEmpty()) {
+            emessage = "Vui lòng nhập ngày sinh";
+            return false;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        try {
+            LocalDate dob = LocalDate.parse(ns, formatter);
+            if (dob.isAfter(LocalDate.now())) {
+                emessage = "Ngày sinh không được là ngày trong tương lai";
+                return false;
+            }
+            LocalDate minAgeDate = LocalDate.now().minusYears(18);
+            if (dob.isAfter(minAgeDate)) {
+                emessage = "Độ tuổi không hợp lệ. Nhân viên phải từ 18 tuổi trở lên";
+                return false;
+            }
+        } catch (DateTimeParseException ex) {
+            emessage = "Ngày sinh không hợp lệ (Định dạng YYYY/MM/DD hoặc ngày tháng không tồn tại)";
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validateSdt() {
+        String sdt = sdtField.getText().trim();
+        if (sdt.isEmpty()) {
+            emessage = "Vui lòng nhập số điện thoại";
+            return false;
+        } else if (!sdt.matches("\\d+")) {
+            emessage = "Số điện thoại chỉ được chứa ký tự số";
+            return false;
+        } else if (!sdt.startsWith("0")) {
+            emessage = "Số điện thoại phải bắt đầu từ số 0";
+            return false;
+        } else if (sdt.length() != 11 && sdt.length() != 10) {
+            emessage = "Số điện thoại phải có 10 hoặc 11 chữ số";
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validateDiaChi() {
+        String diachi = diachiField.getText().trim();
+        String addressPattern = "^[a-zA-Z0-9\\s\\p{L}/,.-]+$";
+        if (diachi.isEmpty()) {
+            emessage = "Vui lòng nhập địa chỉ";
+            return false;
+        } else if (diachi.length() > 100) {
+            emessage = "Vui lòng nhập địa chỉ không quá 100 ký tự";
+            return false;
+        } else if (!diachi.matches(addressPattern)) {
+            emessage = "Địa chỉ không được chứa ký tự đặc biệt";
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validateTaiKhoan() {
+        String tk = tkField.getText().trim();
+        String emailPattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$";
+        if (tk.isEmpty()) {
+            emessage = "Vui lòng nhập tên tài khoản";
+            return false;
+        } else if (tk.length() > 30) {
+            emessage = "Email không được vượt quá 30 ký tự";
+            return false;
+        } else if (!tk.matches(emailPattern)) {
+            emessage = "Vui lòng nhập đúng định dạng Email";
+            return false;
+        }
+        for (nhanvien nv : nhanVienList) {
             if (nv.getTk().equalsIgnoreCase(tk)) {
                 emessage = "Email này đã được sử dụng, vui lòng nhập email khác";
                 return false;
             }
         }
-	    
-	    //validate cho mk
-	    boolean hasLetter = mk.matches(".*[a-zA-Z].*"); 
-	    boolean hasDigit = mk.matches(".*\\d.*"); 
-	    if(mk.isEmpty()) {
-	    	emessage = "Vui lòng nhập mật khẩu";
-	    	return false;
-	    }
-	    else if(mk.length()<6) {
-	    	emessage = "Mật khẩu phải có ít nhất 6 ký tự";
-	    	return false;
-	    }
-	    else if(mk.length()>20) {
-	    	emessage = "Mật khẩu không được vượt quá 20 ký tự";
-	    	return false;
-	    }
-	    else if(mk.contains(" ")) {
-	    	emessage = "Mật khẩu không được chứa khoảng trắng";
-	    	return false;
-	    }
-	    
-	    else if(!hasLetter||!hasDigit) {
-	    	emessage = "Mật khẩu phải bao gồm chữ cái và chữ số";
-	    	return false;
-	    }
-	    return true;
+        return true;
     }
+
+    private boolean validateMatKhau() {
+        String mk = mkField.getText().trim();
+        boolean hasLetter = mk.matches(".*[a-zA-Z].*");
+        boolean hasDigit = mk.matches(".*\\d.*");
+        if (mk.isEmpty()) {
+            emessage = "Vui lòng nhập mật khẩu";
+            return false;
+        } else if (mk.length() < 6) {
+            emessage = "Mật khẩu phải có ít nhất 6 ký tự";
+            return false;
+        } else if (mk.length() > 20) {
+            emessage = "Mật khẩu không được vượt quá 20 ký tự";
+            return false;
+        } else if (mk.contains(" ")) {
+            emessage = "Mật khẩu không được chứa khoảng trắng";
+            return false;
+        } else if (!hasLetter || !hasDigit) {
+            emessage = "Mật khẩu phải bao gồm chữ cái và chữ số";
+            return false;
+        }
+        return true;
+    }
+    private boolean Validate() {
+    	if (!validateHoTen()) return false;
+        if (!validateGioiTinh()) return false;
+        if (!validateNgaySinh()) return false;
+        if (!validateSdt()) return false;
+        if (!validateDiaChi()) return false;
+        if (!validateTaiKhoan()) return false;
+        if (!validateMatKhau()) return false;
+        return true;
+    }
+	    
+	    
+    
 
     /**
      * 1. Thêm nhân viên
